@@ -1,83 +1,85 @@
-ï»¿@echo off
+@echo off
 chcp 65001 >nul
 setlocal enabledelayedexpansion
-title Video2Text - æœ¬åœ°éŸ³è§†é¢‘è½¬æ–‡å­—å·¥å…·
 cd /d "%~dp0"
 
+title Video2Text - ±¾µØÒôÊÓÆµ×ªÎÄ×Ö¹¤¾ß
+
 echo ========================================
-echo  Video2Text - æœ¬åœ°éŸ³è§†é¢‘è½¬æ–‡å­—å·¥å…·
+echo  Video2Text - ±¾µØÒôÊÓÆµ×ªÎÄ×Ö¹¤¾ß
 echo ========================================
 echo.
 
-:: 1) æŸ¥æ‰¾å·²çŸ¥å®‰è£…è·¯å¾„ä¸­çš„ Python
-set PYTHON_CMD=
-set "KNOWN_PATHS=%LOCALAPPDATA%\Programs\Python\Python313\python.exe;%LOCALAPPDATA%\Programs\Python\Python312\python.exe;%LOCALAPPDATA%\Programs\Python\Python311\python.exe;%LOCALAPPDATA%\Programs\Python\Python310\python.exe;%USERPROFILE%\python-sdk\python3.13.2\python.exe;%USERPROFILE%\python-sdk\python3.12\python.exe;%USERPROFILE%\python-sdk\python3.11\python.exe;%USERPROFILE%\python-sdk\python3.10\python.exe;C:\Python313\python.exe;C:\Python312\python.exe;C:\Python311\python.exe;C:\Python310\python.exe"
+:: ÏÈ²éÒÑÖªÂ·¾¶
+set "PY_PATH=%USERPROFILE%\python-sdk\python3.13.2\python.exe"
+if exist "%PY_PATH%" goto found_py
 
-for %%P in (%KNOWN_PATHS%) do (
-    if exist %%P (
-        set "PYTHON_CMD=%%P"
+:: ²éÆäËû³£¼û°²×°Â·¾¶
+set "FALLBACKS=%LOCALAPPDATA%\Programs\Python\Python313\python.exe %LOCALAPPDATA%\Programs\Python\Python312\python.exe %LOCALAPPDATA%\Programs\Python\Python311\python.exe %LOCALAPPDATA%\Programs\Python\Python310\python.exe %USERPROFILE%\python-sdk\python3.13.2\python.exe %USERPROFILE%\python-sdk\python3.12\python.exe %USERPROFILE%\python-sdk\python3.11\python.exe %USERPROFILE%\python-sdk\python3.10\python.exe"
+for %%P in (%FALLBACKS%) do (
+    if exist "%%P" (
+        set "PY_PATH=%%P"
         goto found_py
     )
 )
 
-:: æ²¡æ‰¾åˆ°å·²çŸ¥è·¯å¾„ï¼Œæœç´¢ PATH ä¸­çš„çœŸ Python
-where python 2>nul | findstr /V /I "WindowsApps" >nul
-if %errorlevel% equ 0 (
-    for /f "delims=" %%X in ('where python 2^>nul ^| findstr /V /I "WindowsApps"') do (
-        set "PYTHON_CMD=%%X"
-        goto found_py
-    )
-)
-
-:: å°è¯• py å¯åŠ¨å™¨
+:: ³¢ÊÔ py Æô¶¯Æ÷
 where py >nul 2>&1
 if %errorlevel% equ 0 (
-    set "PYTHON_CMD=py"
+    set "PY_PATH=py"
     goto found_py
 )
 
-echo [é”™è¯¯] æ‰¾ä¸åˆ° Pythonï¼
-echo è¯·å…ˆå®‰è£… Python 3.10+ï¼šhttps://www.python.org/downloads/
-echo å®‰è£…æ—¶åŠ¡å¿…å‹¾é€‰ "Add Python to PATH"
+:: ×îºóÊÔ PATH ÖĞµÄ python£¨ÅÅ³ı WindowsApps£©
+where python 2>nul | findstr /V /I "WindowsApps" >nul
+if %errorlevel% equ 0 (
+    for /f "delims=" %%X in ('where python 2^>nul ^| findstr /V /I "WindowsApps"') do (
+        set "PY_PATH=%%X"
+        goto found_py
+    )
+)
+
+echo [´íÎó] ÕÒ²»µ½ Python£¡
+echo ÇëÏÈ°²×° Python 3.10+£ºhttps://www.python.org/downloads/
 pause
 exit /b 1
 
 :found_py
-echo [OK] Python: !PYTHON_CMD!
-"!PYTHON_CMD!" --version
+echo [OK] Python: %PY_PATH%
+"%PY_PATH%" --version
 echo.
 
-:: æ£€æŸ¥å®‰è£…ä¾èµ–
-echo [1/3] æ£€æŸ¥ä¾èµ–...
-"!PYTHON_CMD!" -c "import fastapi" >nul 2>&1
-if !errorlevel! neq 0 (
-    echo [2/3] å®‰è£…ä¾èµ–...
-    "!PYTHON_CMD!" -m pip install -r requirements.txt
-    if !errorlevel! neq 0 (
-        echo [é”™è¯¯] ä¾èµ–å®‰è£…å¤±è´¥ï¼Œè¯·æ£€æŸ¥ç½‘ç»œ
+:: ¼ì²éÒÀÀµ
+echo [1/3] ¼ì²éÒÀÀµ...
+"%PY_PATH%" -c "import fastapi" >nul 2>&1
+if %errorlevel% neq 0 (
+    echo [2/3] °²×°ÒÀÀµ...
+    "%PY_PATH%" -m pip install -r requirements.txt
+    if %errorlevel% neq 0 (
+        echo [´íÎó] ÒÀÀµ°²×°Ê§°Ü£¬Çë¼ì²éÍøÂç
         pause
         exit /b 1
     )
 ) else (
-    echo [OK] ä¾èµ–å·²å°±ç»ª
+    echo [OK] ÒÀÀµÒÑ¾ÍĞ÷
 )
 
-echo [3/3] æ£€æŸ¥ ffmpeg...
+echo [3/3] ¼ì²é ffmpeg...
 where ffmpeg >nul 2>&1
-if !errorlevel! neq 0 (
-    echo [æç¤º] æœªæ‰¾åˆ° ffmpegï¼ˆè§†é¢‘æ–‡ä»¶å¤„ç†å¯èƒ½å—é™ï¼‰
-    echo        å¯ä» https://ffmpeg.org/download.html ä¸‹è½½
+if %errorlevel% neq 0 (
+    echo [ÌáÊ¾] Î´ÕÒµ½ ffmpeg£¨ÊÓÆµ´¦Àí¿ÉÄÜÊÜÏŞ£©
+    echo        ¿É°²×°: https://ffmpeg.org/download.html
 )
 
 if not exist "uploads" mkdir uploads
 
 echo.
 echo ========================================
-echo  å¯åŠ¨æˆåŠŸï¼
-echo  è®¿é—®åœ°å€: http://127.0.0.1:8000
-echo  å…³é—­æ­¤çª—å£å³å¯åœæ­¢æœåŠ¡
+echo  Æô¶¯³É¹¦£¡
+echo  ·ÃÎÊµØÖ·: http://127.0.0.1:8000
+echo  ¹Ø±Õ´Ë´°¿Ú¼´¿ÉÍ£Ö¹·şÎñ
 echo ========================================
 echo.
 
-"!PYTHON_CMD!" app.py
+"%PY_PATH%" app.py
 pause
