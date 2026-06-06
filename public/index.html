@@ -7,10 +7,68 @@
     <link rel="stylesheet" href="/public/style.css">
 </head>
 <body>
-    <h1>Video2Text</h1>
-    <p>本地音视频转文字工具</p>
-    
-    <div id="app"></div>
+    <div class="container">
+        <header>
+            <h1>Video2Text</h1>
+            <p class="subtitle">本地音视频转文字工具</p>
+        </header>
+        
+        <section class="upload-section">
+            <div class="upload-area" id="uploadArea">
+                <div class="upload-icon">📁</div>
+                <p class="upload-text">拖拽视频/音频文件到此处</p>
+                <p class="upload-hint">或点击选择文件</p>
+                <input type="file" id="fileInput" multiple accept="video/*,audio/*" hidden>
+            </div>
+            <div class="supported-formats">
+                <span>支持格式：</span>
+                <code>MP4</code>
+                <code>MP3</code>
+                <code>WAV</code>
+                <code>M4A</code>
+                <code>MKV</code>
+                <code>AVI</code>
+            </div>
+        </section>
+        
+        <section class="model-section">
+            <div class="model-selector">
+                <label for="modelSelect">Whisper 模型：</label>
+                <select id="modelSelect">
+                    <option value="tiny">Tiny (39MB) - 最快</option>
+                    <option value="base" selected>Base (140MB) - 推荐</option>
+                    <option value="small">Small (466MB) - 较快</option>
+                    <option value="medium">Medium (1.5GB) - 准确</option>
+                    <option value="large">Large (2.9GB) - 最准确</option>
+                </select>
+            </div>
+            <div class="model-status" id="modelStatus">
+                <span class="status-indicator"></span>
+                <span class="status-text">模型加载中...</span>
+            </div>
+        </section>
+        
+        <section class="tasks-section">
+            <h2>转录队列</h2>
+            <div class="tasks-list" id="tasksList">
+                <div class="empty-state">
+                    <p>暂无转录任务</p>
+                </div>
+            </div>
+        </section>
+        
+        <section class="result-section" id="resultSection" style="display: none;">
+            <h2>转录结果</h2>
+            <div class="result-meta" id="resultMeta"></div>
+            <div class="result-content" id="resultContent"></div>
+            <div class="result-actions">
+                <button class="btn btn-primary" id="copyBtn">复制全文</button>
+                <button class="btn" id="exportTxtBtn">导出 TXT</button>
+                <button class="btn" id="exportMdBtn">导出 Markdown</button>
+                <button class="btn" id="exportSrtBtn">导出字幕 (SRT)</button>
+            </div>
+        </section>
+    </div>
     
     <script src="/public/app.js"></script>
 </body>
