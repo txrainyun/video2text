@@ -129,10 +129,8 @@ async def switch_model(model_name: str = Query(...)):
 
 @app.post("/upload")
 async def upload_file(file: UploadFile = File(...)):
-    success, error = ensure_model_loaded()
-    if not success:
-        raise HTTPException(status_code=500, detail=error)
-
+    # 不在上传时阻塞式加载模型，避免大型模型加载导致上传接口失败。
+    # 模型加载将在后台任务处理中进行（process_transcription）。
     task_id = str(uuid.uuid4())
     safe_name = file.filename or "unknown"
     file_path = UPLOAD_DIR / f"{task_id}_{safe_name}"
@@ -142,7 +140,7 @@ async def upload_file(file: UploadFile = File(...)):
         with open(file_path, "wb") as f:
             f.write(contents)
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"??????: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"保存文件失败: {str(e)}")
 
     tasks[task_id] = {
         "id": task_id,
