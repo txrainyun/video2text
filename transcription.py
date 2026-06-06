@@ -3,6 +3,7 @@ from typing import Optional, Dict, Any
 import asyncio
 from concurrent.futures import ThreadPoolExecutor
 import subprocess
+import shutil
 import os
 
 class TranscriptionService:
@@ -12,6 +13,10 @@ class TranscriptionService:
 
     def _extract_audio(self, video_path: str) -> str:
         """从视频中提取音频"""
+        # 验证输入文件是否存在
+        if not os.path.exists(video_path):
+            raise FileNotFoundError(f"待处理文件不存在: {video_path}")
+
         audio_path = video_path.rsplit('.', 1)[0] + '_audio.wav'
 
         # 检查是否已经是音频文件
@@ -19,22 +24,33 @@ class TranscriptionService:
         if ext in ['.mp3', '.wav', '.m4a', '.flac', '.aac', '.ogg']:
             return video_path
 
+        # 检查 ffmpeg 是否可用
+        ffmpeg_path = shutil.which('ffmpeg')
+        if ffmpeg_path is None:
+            raise RuntimeError(
+                "ffmpeg 未找到。请安装 ffmpeg 并将其添加到系统 PATH。\n"
+                "下载地址：https://ffmpeg.org/download.html"
+            )
+
         # 使用ffmpeg提取音频
         try:
             subprocess.run([
-                'ffmpeg', '-i', video_path,
+                ffmpeg_path, '-i', video_path,
                 '-vn', '-acodec', 'pcm_s16le',
                 '-ar', '16000', '-ac', '1',
                 '-y', audio_path
             ], check=True, capture_output=True)
             return audio_path
-        except FileNotFoundError:
-            # ffmpeg 未安装或不在 PATH，抛出清晰错误，便于前端展示指导信息
+        except (FileNotFoundError, OSError):
+            # 即使 shutil.which 通过了，仍可能在执行时找不到（如 Path 变动、权限问题）
             raise RuntimeError(
-                "ffmpeg 未找到。请安装 ffmpeg 并将其添加到系统 PATH。下载：https://ffmpeg.org/download.html"
+                "ffmpeg 未找到。请安装 ffmpeg 并将其添加到系统 PATH。\n"
+                "下载地址：https://ffmpeg.org/download.html"
             )
-        except subprocess.CalledProcessError:
+        except subprocess.CalledProcessError as e:
             # ffmpeg 命令执行失败（例如输入文件格式问题），回退为返回原文件路径
+            error_msg = e.stderr.decode() if e.stderr else str(e)
+            print(f"ffmpeg 处理失败: {error_msg}")
             return video_path
 
     async def transcribe(

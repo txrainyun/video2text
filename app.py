@@ -45,10 +45,10 @@ def init_model():
         transcription_service = TranscriptionService(None)
         model_manager.load_model()
         transcription_service.model = model_manager.model
-        print("????")
+        print("模型加载成功！")
         return True
-    except Exception:
-        print("??????????????")
+    except Exception as e:
+        print(f"模型加载失败: {e}")
         return False
 
 
