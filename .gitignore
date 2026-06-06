@@ -1,4 +1,4 @@
-# Python
+﻿# Python
 __pycache__/
 *.py[cod]
 *.egg-info/
@@ -9,10 +9,10 @@ build/
 # 模型文件（太大，不上传到 GitHub）
 models/
 
-# 上传的文件
+# 上传的临时文件
 uploads/
 
-# 任务数据
+# 任务数据（包含用户隐私内容）
 tasks.json
 
 # 测试缓存

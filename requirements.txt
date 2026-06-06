@@ -1,5 +1,11 @@
-fastapi>=0.115.0
-uvicorn[standard]>=0.30.0
-python-multipart>=0.0.9
+﻿# 核心框架
+fastapi>=0.109.0
+uvicorn[standard]>=0.27.0
+python-multipart>=0.0.6
 aiofiles>=23.2.1
-openai-whisper==20231117
+
+# Whisper 转写（使用 faster-whisper，性能更好）
+faster-whisper>=1.0.0
+
+# 部署辅助
+# gunicorn==22.0.0  # 如需 Linux 生产部署，取消注释
