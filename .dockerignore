@@ -1,0 +1,11 @@
+models/
+__pycache__/
+*.pyc
+uploads/
+.env
+.venv/
+venv/
+.git
+tests/
+.pytest_cache/
+*.log
