@@ -28,8 +28,13 @@ class TranscriptionService:
                 '-y', audio_path
             ], check=True, capture_output=True)
             return audio_path
+        except FileNotFoundError:
+            # ffmpeg 未安装或不在 PATH，抛出清晰错误，便于前端展示指导信息
+            raise RuntimeError(
+                "ffmpeg 未找到。请安装 ffmpeg 并将其添加到系统 PATH。下载：https://ffmpeg.org/download.html"
+            )
         except subprocess.CalledProcessError:
-            # 如果ffmpeg不可用，直接返回原文件
+            # ffmpeg 命令执行失败（例如输入文件格式问题），回退为返回原文件路径
             return video_path
 
     async def transcribe(
