@@ -94,6 +94,13 @@ section h2 {
 .upload-hint {
     color: var(--text-secondary);
     font-size: 0.9rem;
+    margin-bottom: 16px;
+}
+
+.upload-btn {
+    margin-top: 8px;
+    font-size: 1rem;
+    padding: 12px 32px;
 }
 
 .supported-formats {

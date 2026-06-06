@@ -17,9 +17,21 @@ class Video2TextApp {
     bindEvents() {
         const uploadArea = document.getElementById('uploadArea');
         const fileInput = document.getElementById('fileInput');
+        const uploadBtn = document.getElementById('uploadBtn');
         
         // 上传区域点击
-        uploadArea.addEventListener('click', () => fileInput.click());
+        uploadArea.addEventListener('click', (e) => {
+            // 避免按钮点击时重复触发
+            if (e.target !== uploadBtn) {
+                fileInput.click();
+            }
+        });
+        
+        // 选择文件按钮点击
+        uploadBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            fileInput.click();
+        });
         
         // 文件选择
         fileInput.addEventListener('change', (e) => this.handleFiles(e.target.files));
